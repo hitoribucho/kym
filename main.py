@@ -1,87 +1,60 @@
-# coding: utf-8
-from flask import Flask,render_template,url_for
-from flask_wtf import FlaskForm
 from flask.ext.sqlalchemy import SQLAlchemy
-from wtforms import StringField
-from wtforms.validators import Length, Required, URL
-from bs4 import BeautifulSoup
-import urllib.request
-from urllib.parse import urljoin
+from flask import Flask, render_template, request
 import os
-import pickle
 
+# DB接続に関する部分
 app = Flask(__name__)
-app.secret_key = 'AskfjghjdsaDFkrdnaladfae'
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
-#サンプル
+# モデル作成
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80))
-    email = db.Column(db.String(120), unique=True)
+    username = db.Column(db.String(80), unique=True)
+    email = db.Column(db.String(80), unique=True)
 
-    def __init__(self, name, email):
-        self.name = name
+    def __init__(self, username, email):
+        self.username = username
         self.email = email
 
     def __repr__(self):
-        return '<Name %r>' % self.name
-    def sample():
-        user = User('John Doe', 'john.doe@example.com')
-        db.session.add(user)
+        return '<User %r>' % self.username
+
+class Task(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    tasks = db.Column(db.String(80))
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'))
+
+    def __init__(self, tasks, user_id):
+        self.tasks = tasks
+        self.user_id = user_id
+
+    def __repr__(self):
+        return '<Task %r>' % self.tasks
+
+# データベースに追加するコード例
+@app.route("/", methods=['POST'])
+def register():
+    if request.method == 'POST':
+        name= request.form['name']
+        email = request.form['email']
+        task = request.form['task']
+        # emailが未登録ならユーザー追加
+    if not db.session.query(User).filter(User.email == email).count():
+        reg = User(name, email)
+        db.session.add(reg)
         db.session.commit()
 
-class UrlForm(FlaskForm):
-    url = StringField(
-        label='URL：',
-        validators=[
-            Required('URLを入力してください'),
-            Length(min=1, max=1024, message='URLは1024文字以内で入力してください'),
-            URL(message='URLが正しくありません'),
-        ])
 
-@app.route('/', methods=['GET', 'POST'])
-def send_url():
-    form = UrlForm()
-    if form.validate_on_submit():
-        url = form.url.data
-        # print('送られたURLは {} だよ'.format(url))
+        # タスク追加
+        user_id= User.query.filter_by(User.email == email).first().id
+        task = Task(text, user_id)
+        db.session.add(task)
+        db.session.commit()
 
-        req = urllib.request.Request(url)
-        response = urllib.request.urlopen(req)
-        html = response.read()
-        soup = BeautifulSoup(html, "lxml")
+        return render_template('success.html')
+        return render_template('index.html')
 
-        #データの読み書き
-        User.add()
-        all_users = User.query.all()
-
-
-        return render_template('index.html', form=form, all_users=all_users)
-
-    else:
-        User.sample()
-        all_users = User.query.all()
-        return render_template('index.html', form=form)
-
-@app.route('/reset')
-def reset_db():
-    form = UrlForm()
-    Data=Database()
-    Data.reset()
-    Data.close()
-    return render_template('index.html',form=form)
-'''
-@app.route('/download_db')
-def download_db():
-    form = UrlForm()
-    filename = os.path.join(app.root_path, "database.db")}
-    urllib.request.urlretrieve(filename,'buckup.db')
-    return render_template('index.html',form=form)
-'''
-
-# アプリケーションの実行
 if __name__ == '__main__':
-    #app.run()
-    app.run(debug=True)
+    app.debug = True
+    app.run()
