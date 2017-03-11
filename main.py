@@ -19,8 +19,8 @@ db = SQLAlchemy(app)
 import sqlite3
 class Database():
     def __init__(self):
-        conn = psycopg2.connect("dbname=test host=localhost user=postgres")
-
+        pass
+        
     def close(self):
         pass
 
