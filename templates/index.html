@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="ブロガーのためのリンクカード作成アプリです。">
+    <meta name="googlebot" content="index,follow">
+    <meta property="og:url" content="https://example.com/page.html">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Keep Your Movies">
+    <meta property="og:image" content="{{ url_for('static', filename='images/logo.jpg') }}">
+    <meta property="og:description" content="ブロガーのためのリンクカード作成アプリです。">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='reset.css') }}">
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <title>リンクメーカー</title>
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-93364526-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+  </head>
+  <body class="ma p10" style="background:#fff">
+    <header>
+      <div>
+        <a href="/" class="title">リンクメーカー(β版)</a>
+      </div>
+      <span class="description">
+        ブロガーのためのリンクカード作成アプリです。
+      </span>
+    </header>
+      <div id="center-column" class="w100">
+          <form action="{{ url_for('send_url') }}" method="post" class="url_input mb30">
+            {{ form.csrf_token }}{{ form.url.label }}{{ form.url }}
+            {% for error in form.url.errors %}
+            <p role="alert">Error: {{ error }}</p>
+            {% endfor %}
+            <input type="submit" value="リンクを生成" class="generate">
+          </form>
+          <div class="w90 max500 mb30">
+            <div style="{{link_card}}"><a href="{{url}}" style="{{fit_link}}"><img src="{{img_src}}" alt="" style="{{img_style}}"><span style="{{title_style}}">{{title}}</span><hr style="{{hr_style}}"><span style="{{description_style}}">{{description}}</span></a></div>
+          </div>
+          <h3 class="center">↓↓↓↓コードをコピーしてブログの好きな場所に貼り付け↓↓↓↓</h3>
+          <textarea class="w90 mt20">
+            {{link_code}}
+          </textarea>
+          {% if data_list %}
+          <h3 class="center mt20 mb20">最近の人気ページ</h3>
+          <div id="popular" class="flex-container">
+            {% for data in data_list %}
+            <div class="card br5" style="background:url('{{data[1]}}') no-repeat;background-position:center;background-size:cover">
+              <a href="{{data[0]}}">
+              <span class="title">{{data[2]}}</span>
+              <span class="count">{{data[4]}}</span>
+              </a>
+            </div>
+            {% endfor %}
+          </div><!--popular-->
+          {% endif %}
+      </div>
+        </body>
+  <footer>
+    <div class="center size50" style=" color:#999">
+      Produced by <a href="https://twitter.com/starrow1103">@starrow</a>
+    </div>
+  </footer>
+</html>
