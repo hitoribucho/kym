@@ -27,7 +27,7 @@ class User(db.Model):
 
     def __repr__(self):
         return '<Name %r>' % self.name
-    def add(self):
+    def sample():
         user = User('John Doe', 'john.doe@example.com')
         db.session.add(user)
         db.session.commit()
@@ -58,11 +58,11 @@ def send_url():
         all_users = User.query.all()
 
 
-        return render_template('index.html', form=form all_users=all_users)
+        return render_template('index.html', form=form, all_users=all_users)
 
     else:
-        Data=Database()
-        Data.close()
+        User.sample()
+        all_users = User.query.all()
         return render_template('index.html', form=form)
 
 @app.route('/reset')
