@@ -15,20 +15,22 @@ app.secret_key = 'AskfjghjdsaDFkrdnaladfae'
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ["DATABASE_URL"]
 db = SQLAlchemy(app)
 
-#データベース
-import sqlite3
-class Database():
-    def __init__(self):
-        pass
-        
-    def close(self):
-        pass
+#サンプル
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80))
+    email = db.Column(db.String(120), unique=True)
 
-    def reset(self):
-        pass
+    def __init__(self, name, email):
+        self.name = name
+        self.email = email
 
-    def insert(self,url_info):
-        pass
+    def __repr__(self):
+        return '<Name %r>' % self.name
+    def add(self):
+        user = User('John Doe', 'john.doe@example.com')
+        db.session.add(user)
+        db.session.commit()
 
 class UrlForm(FlaskForm):
     url = StringField(
@@ -52,11 +54,11 @@ def send_url():
         soup = BeautifulSoup(html, "lxml")
 
         #データの読み書き
-        Data=Database()
-        #データベースを保存して閉じる
-        Data.close()
+        User.add()
+        all_users = User.query.all()
 
-        return render_template('index.html', form=form)
+
+        return render_template('index.html', form=form all_users=all_users)
 
     else:
         Data=Database()
