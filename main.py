@@ -19,6 +19,9 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+users = User.query.all()
+print(users)
+
 @app.route('/')
 def hello():
     return "Hello World!"
